@@ -177,6 +177,9 @@
 
       <script type="text/JavaScript">
         const {spawn } = require ("child_process");
+        const path = require("path");
+
+        var appDir = path.dirname(require.main.filename);
 
         function elem (id) {
           return document.getElementById(id);
@@ -189,71 +192,100 @@
         let outversion = elem("outversion");
         let imgfmt = elem("imgfmt");
         let platform = elem("platform");
+        let vlog = elem("dVerboseLog");
 
         function calculateCommand () {
-          let cmd = "-files ";
-          for (let i=0; i<filePathList.length; i++) {
-            cmd += filePathList[i];
-            if (i >= filePathList.length-1) {
-              cmd+=" ";
-            } else {
-              cmd+=";";
+          let args = [];
+          
+          let cmd = "";
+          if (filePathList.length > 0) {
+            cmd = "-files ";
+            for (let i=0; i<filePathList.length; i++) {
+              cmd += filePathList[i];
+              if (i >= filePathList.length-1) {
+                cmd+=" ";
+              } else {
+                cmd+=";";
+              }
             }
+            args.push(cmd);
           }
 
-          cmd+="-version ";
+          //DEBUG
+          cmd = "-file mission.lvl";
+          args.push(cmd);
+          //ENDDEBUG
+
+          cmd = "-version ";
           let temp = version.options[version.selectedIndex].text;
           if (temp === "swbf" || temp === "swbf_ii") {
-            cmd += temp + " ";
+            cmd += temp;
           } else {
-            cmd += "swbf "; //Safety net, maybe complain to user later? This shouldn't happen
+            cmd += "swbf"; //Safety net, maybe complain to user later? This shouldn't happen
             console.log("-version wasn't swbf or swbf_ii, defaulted swbf");
           }
 
-          cmd+="-outversion ";
+          args.push(cmd);
+
+          cmd = "-outversion ";
           temp = outversion.options[outversion.selectedIndex].text;
           if (temp === "swbf" || temp === "swbf_ii") {
-            cmd += temp + " ";
+            cmd += temp;
           } else {
-            cmd += "swbf "; //Again, safety net
+            cmd += "swbf"; //Again, safety net
             console.log("-version wasn't swbf or swbf_ii, defaulted swbf");
           }
+          args.push(cmd);
 
-          cmd += "-imgfmt ";
+          cmd = "-imgfmt ";
           temp = imgfmt.options[imgfmt.selectedIndex].text;
           if (temp === "dds" || temp === "tga") {
-            cmd += temp + " ";
+            cmd += temp;
           } else {
-            cmd += "tga ";
+            cmd += "tga";
             console.log("-imgfmt wasn't tga or dds, defaulted tga");
           }
-          cmd += "-platform ";
+          args.push(cmd);
+
+          cmd = "-platform ";
           temp = platform.options[platform.selectedIndex].text;
           if (temp === "pc" || temp === "xbox" || temp === "ps2") {
-            cmd += temp + " ";
+            cmd += temp;
           } else {
-            cmd += "pc ";
+            cmd += "pc";
             console.log("-platform wasn't pc, ps2, or xbox, defaulted pc");
           }
+          args.push(cmd);
+          args.push("-verbose");
 
-          cmd += "-verbose";
-
-          return cmd;
+          return args;
         }
 
         function go () {
-          alert(calculateCommand());
-          /*
-          var child = spawn ("swbf-unmunge " + cmd);
+          
+          let swbf_unmunge_dir = appDir;
+          let swbf_unmunge_path = path.join(swbf_unmunge_dir, "swbf-unmunge");
+          let args = calculateCommand();
+          alert(swbf_unmunge_dir);
+          alert(args);
 
+          var child = spawn ( swbf_unmunge_path, args );
+
+          vlog.innerText = "";
           child.stdout.on("data", (chunk)=> {
+            vlog.innerText += chunk;
+            vlog.appendChild(document.createElement("br"));
             //Data from standard output in chunks
           });
 
           child.stdout.on("close", (code)=> {
             //process exited with code
+            alert("SWBFUnmunge closed with \"" + code + "\"");
           });
-          */
+          
+          child.on('error', (err) => {
+            console.log("Failed to start swbf-unmunge, we couldn't access it!");
+          });
         }
 
       </script>
