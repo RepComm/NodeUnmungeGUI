@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Hello World!</title>
+    <style>
+      body {
+        background-color:rgb(54, 53, 53);
+      }
+      #dFileDrop {
+        position:absolute;
+        top:0px;
+        left:0px;
+        width:45%;
+        height:35%;
+        border-radius:15px;
+        text-align:center;
+        padding:1%;
+        cursor: pointer;
+      }
+      #dInputSettings {
+        position:absolute;
+        top:40%;
+        left:0%;
+        width:45%;
+        height:35%;
+        padding:1%;
+        border-radius:15px;
+      }
+      #dOutputSettings {
+        position:absolute;
+        top:40%;
+        left:50%;
+        width:45%;
+        height:35%;
+        padding:1%;
+        border-radius:15px;
+      }
+      #dFileList {
+        position:absolute;
+        top:0%;
+        left:50%;
+        width:45%;
+        height:35%;
+        padding:1%;
+        border-radius:15px;
+        overflow-x:hidden;
+        overflow-y:scroll;
+      }
+      #dCommandGenerated {
+        position:absolute;
+        top:80%;
+        left:0%;
+        width:32%;
+        height:15%;
+        padding:1%;
+        border-radius:15px;
+      }
+      #dGoButton {
+        position:absolute;
+        top:80%;
+        left:35%;
+        width:28%;
+        height:15%;
+        padding:1%;
+        border-radius:15px;
+        text-align:center;
+        font-size:2em;
+        background-color:rgb(48, 148, 48);
+        cursor:pointer;
+        transition: all 0.2s ease-out;
+      }
+      #dGoButton:hover {
+        background-color:rgb(39, 189, 39);
+      }
+      #dVerboseLog {
+        position:absolute;
+        top:80%;
+        left:66%;
+        width:29%;
+        height:15%;
+        padding:1%;
+        border-radius:15px;
+      }
+      .sFileBox {
+        padding-left:5px;
+        border-radius:2px;
+        padding-right:20px;
+        background-color:rgb(121, 147, 151);
+        color:rgb(236, 236, 236);
+        cursor: pointer;
+      }
+      .cool {
+        transition: all 0.5s ease-out;
+        color:rgb(209, 209, 209);
+        background-color:rgb(96, 110, 112);
+        font-family:Arial, Helvetica, sans-serif;
+        font-size:1em;
+        font-weight:bold;
+      }
+      .cool:hover {
+        background-color:rgb(113, 130, 133);
+        color:rgb(219, 218, 218);
+      }
+      select {
+        padding-left:10px;
+        padding-right:10px;
+        border-radius:4px;
+        background-color:rgb(167, 183, 185);
+        color:rgb(255, 255, 255);
+        font-family:Arial, Helvetica, sans-serif;
+        font-size:1em;
+        font-weight:bold;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      require('./renderer.js')
+    </script>
+    <div id="dFileList" class="cool">
+      <span class="sFileBox">C:/Program Files/somefile.lvl</span>
+    </div>
+    <div id="dFileDrop" class="cool">
+      <br>
+      Drop Files, or click here to open
+      <br><br>
+      file browser to choose files
+    </div>
+    <div id="dInputSettings" class="cool">
+      <br>
+      <span>LVL File Input Settings</span>
+      <br><br>
+      <span>Built for game:</span>
+      <select id="version" name="Built for game:">
+        <option value="swbf" class="cool">swbf</option>
+        <option value="swbf_ii" class="cool">swbf_ii</option>
+      </select>
+
+      <br>
+      <span>Built for platform:</span>
+      <select id="platform" name="Built for platform:">
+        <option value="pc" class="cool">pc</option>
+        <option value="ps2" class="cool">ps2</option>
+        <option value="xbox" class="cool">xbox</option>
+      </select>
+    </div>
+
+    <div id="dOutputSettings" class="cool">
+        <br>
+        <span>Output Settings</span>
+        <br><br>
+        <span>Decompile for game:</span>
+        <select id="outversion" name="game:">
+          <option value="swbf" class="cool">swbf</option>
+          <option value="swbf_ii" class="cool">swbf_ii</option>
+        </select>
+
+        <br>
+        <span>Texture/Image output format:</span>
+        <select id="imgfmt" name="imageoutfmt:">
+          <option value="tga" class="cool">tga</option>
+          <option value="dds" class="cool">dds</option>
+        </select>
+      </div>
+
+      <div id="dCommandGenerated" class="cool">
+        Generated command will go here
+      </div>
+      <div id="dGoButton" class="cool" onclick="go();">
+        <br>
+        GO
+      </div>
+      <div id="dVerboseLog" class="cool">
+        Verbose Log from swbf-unmunge process will go here
+      </div>
+
+      <script type="text/JavaScript">
+        const {spawn } = require ("child_process");
+
+        function elem (id) {
+          return document.getElementById(id);
+        }
+
+        let filePathList = [];
+        
+        //Elements
+        let version = elem("version");
+        let outversion = elem("outversion");
+        let imgfmt = elem("imgfmt");
+        let platform = elem("platform");
+
+        function calculateCommand () {
+          let cmd = "-files ";
+          for (let i=0; i<filePathList.length; i++) {
+            cmd += filePathList[i];
+            if (i >= filePathList.length-1) {
+              cmd+=" ";
+            } else {
+              cmd+=";";
+            }
+          }
+
+          cmd+="-version ";
+          let temp = version.options[version.selectedIndex].text;
+          if (temp === "swbf" || temp === "swbf_ii") {
+            cmd += temp + " ";
+          } else {
+            cmd += "swbf "; //Safety net, maybe complain to user later? This shouldn't happen
+            console.log("-version wasn't swbf or swbf_ii, defaulted swbf");
+          }
+
+          cmd+="-outversion ";
+          temp = outversion.options[outversion.selectedIndex].text;
+          if (temp === "swbf" || temp === "swbf_ii") {
+            cmd += temp + " ";
+          } else {
+            cmd += "swbf "; //Again, safety net
+            console.log("-version wasn't swbf or swbf_ii, defaulted swbf");
+          }
+
+          cmd += "-imgfmt ";
+          temp = imgfmt.options[imgfmt.selectedIndex].text;
+          if (temp === "dds" || temp === "tga") {
+            cmd += temp + " ";
+          } else {
+            cmd += "tga ";
+            console.log("-imgfmt wasn't tga or dds, defaulted tga");
+          }
+          cmd += "-platform ";
+          temp = platform.options[platform.selectedIndex].text;
+          if (temp === "pc" || temp === "xbox" || temp === "ps2") {
+            cmd += temp + " ";
+          } else {
+            cmd += "pc ";
+            console.log("-platform wasn't pc, ps2, or xbox, defaulted pc");
+          }
+
+          cmd += "-verbose";
+
+          return cmd;
+        }
+
+        function go () {
+          alert(calculateCommand());
+          /*
+          var child = spawn ("swbf-unmunge " + cmd);
+
+          child.stdout.on("data", (chunk)=> {
+            //Data from standard output in chunks
+          });
+
+          child.stdout.on("close", (code)=> {
+            //process exited with code
+          });
+          */
+        }
+
+      </script>
+  </body>
+</html>

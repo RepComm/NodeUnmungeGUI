@@ -1,0 +1,23 @@
+{
+  "name": "SWBFUnmungeNode",
+  "version": "1.0.0",
+  "description": "SWBFUnmunge remade in Node.js/Electron app",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": "https://github.com/RepComm/SWBFUnmungeNode",
+  "keywords": [
+    "Star Wars",
+    "Battlefront",
+    "Decompile",
+    "GUI",
+    "remade",
+    "Node & Electron"
+  ],
+  "author": "RepComm",
+  "devDependencies": {
+    "electron": "~1.7.8",
+    "electron-packager": "^10.1.2"
+  }
+}
