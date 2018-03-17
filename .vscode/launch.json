@@ -2,15 +2,28 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug Main Process",
+      "type": "chrome",
+      "request": "attach",
+      "name": "Attach to Chrome",
+      "port": 9222,
+      "webRoot": "${workspaceFolder}"
+  },
+  {
       "type": "node",
       "request": "launch",
-      "cwd": "${workspaceRoot}",
-      "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
-      "windows": {
-        "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
-      },
-      "args" : ["."]
-    }
+      "name": "Electron Main",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+      "program": "${workspaceFolder}/main.js",
+      "runtimeArgs": [
+  ".",
+  // this args for attaching render process
+  "--remote-debugging-port=9222"
+],
+"windows": {
+  "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
+},
+      "protocol": "inspector",
+      "console":"integratedTerminal"
+  }
   ]
 }

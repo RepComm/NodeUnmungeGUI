@@ -212,7 +212,7 @@
           }
 
           //DEBUG
-          cmd = "-file mission.lvl";
+          cmd = "-file C:/Users/Jonathan/Desktop/Projects/Node/SWBFUnmungeGUI/mission.lvl";
           args.push(cmd);
           //ENDDEBUG
 
@@ -263,13 +263,13 @@
 
         function go () {
           
-          let swbf_unmunge_dir = appDir;
+          let swbf_unmunge_dir = path.join(appDir, "unmunge");
           let swbf_unmunge_path = path.join(swbf_unmunge_dir, "swbf-unmunge");
           let args = calculateCommand();
-          alert(swbf_unmunge_dir);
-          alert(args);
+          console.log("Unmunge directory", swbf_unmunge_dir);
+          console.log("Arguments", args);
 
-          var child = spawn ( swbf_unmunge_path, args );
+          var child = spawn ( swbf_unmunge_path, args, {windowsVerbatimArguments:true} );
 
           vlog.innerText = "";
           child.stdout.on("data", (chunk)=> {
@@ -280,7 +280,7 @@
 
           child.stdout.on("close", (code)=> {
             //process exited with code
-            alert("SWBFUnmunge closed with \"" + code + "\"");
+            console.log("SWBFUnmunge closed with \"" + code + "\"");
           });
           
           child.on('error', (err) => {

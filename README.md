@@ -1,1 +1,1 @@
-Write readme later, im busy making it work :P
+TODO: Write thorough readme after stable standalone build.
