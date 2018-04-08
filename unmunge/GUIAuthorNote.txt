@@ -1,0 +1,6 @@
+swbf-unmunge is by Hayden Kearns,
+the license for his software is included as 'license.txt'
+
+My tool is only a gui to his tool, and does not provide any
+functionality to decompile process. This gui is for ease
+of use only.
