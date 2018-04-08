@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>NodeUnmungeGUI 1.0 - Electron</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <script>
+      require('../renderer.js')
+    </script>
+    <div id="dFileList" class="cool">
+    </div>
+    <div id="dFileDrop" class="cool">
+      <br>
+      Drop Files, or click here to open
+      <br><br>
+      file browser to choose files
+    </div>
+    <div id="dInputSettings" class="cool">
+      <br>
+      <span>LVL File Input Settings</span>
+      <br><br>
+      <span>Built for game:</span>
+      <select id="version" name="Built for game:">
+        <option value="swbf" class="cool">swbf</option>
+        <option value="swbf_ii" class="cool">swbf_ii</option>
+      </select>
+
+      <br>
+      <span>Built for platform:</span>
+      <select id="platform" name="Built for platform:">
+        <option value="pc" class="cool">pc</option>
+        <option value="ps2" class="cool">ps2</option>
+        <option value="xbox" class="cool">xbox</option>
+      </select>
+    </div>
+
+    <div id="dOutputSettings" class="cool">
+        <br>
+        <span>Output Settings</span>
+        <br><br>
+        <span>Decompile for game:</span>
+        <select id="outversion" name="game:">
+          <option value="swbf" class="cool">swbf</option>
+          <option value="swbf_ii" class="cool">swbf_ii</option>
+        </select>
+
+        <br>
+        <span>Texture/Image output format:</span>
+        <select id="imgfmt" name="imageoutfmt:">
+          <option value="tga" class="cool">tga</option>
+          <option value="dds" class="cool">dds</option>
+        </select>
+      </div>
+
+      <div id="dCommandGenerated" class="cool">
+        Generated command will go here
+      </div>
+      <div id="dGoButton" class="cool" onclick="go();">
+        <br>
+        GO
+      </div>
+      <div id="dVerboseLog" class="cool">
+        Verbose Log from swbf-unmunge process will go here
+      </div>
+
+      <script type="text/JavaScript" src="index.js">
+      </script>
+  </body>
+</html>
