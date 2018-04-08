@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Hello World!</title>
+    <title>NodeUnmungeGUI 1.0 - Electron</title>
     <style>
       body {
         background-color:rgb(54, 53, 53);
@@ -44,8 +44,9 @@
         height:35%;
         padding:1%;
         border-radius:15px;
-        overflow-x:hidden;
+        overflow-x:scroll;
         overflow-y:scroll;
+        display:block;
       }
       #dCommandGenerated {
         position:absolute;
@@ -81,6 +82,10 @@
         height:15%;
         padding:1%;
         border-radius:15px;
+        overflow-y:scroll;
+        font-family:'Courier New', Courier, monospace;
+        font-size:8px;
+        color:white;
       }
       .sFileBox {
         padding-left:5px;
@@ -89,6 +94,8 @@
         background-color:rgb(121, 147, 151);
         color:rgb(236, 236, 236);
         cursor: pointer;
+        display:block;
+        font-size:10px;
       }
       .cool {
         transition: all 0.5s ease-out;
@@ -177,8 +184,9 @@
 
       <script type="text/JavaScript">
         const {spawn } = require ("child_process");
+        const {dialog} = require('electron').remote;
         const path = require("path");
-
+        
         var appDir = path.dirname(require.main.filename);
 
         function elem (id) {
@@ -193,6 +201,44 @@
         let imgfmt = elem("imgfmt");
         let platform = elem("platform");
         let vlog = elem("dVerboseLog");
+        
+        let flist = elem("dFileList");
+        let fdrop = elem("dFileDrop");
+        
+        function clearElementChildren (elem) {
+          while (elem.firstChild) {
+            elem.removeChild(elem.firstChild);
+          }
+        }
+
+        function rebuildFileListDisplay () {
+          clearElementChildren(flist);
+          let sfilebox = undefined;
+          for (let i=0; i<filePathList.length; i++) {
+            //<span class="sFileBox">C:/Program Files/somefile.lvl</span>
+            sfilebox = document.createElement("span");
+            sfilebox.className = "sFileBox";
+            sfilebox.textContent = filePathList[i];
+            sfilebox.index = i;
+            sfilebox.onclick = (evt)=>{
+              filePathList.splice(evt.target.index, 1);
+              evt.target.remove();
+            };
+            flist.appendChild(sfilebox);
+          }
+        }
+
+        fdrop.addEventListener("click", (evt)=>{
+          let selection = dialog.showOpenDialog(
+            {
+              properties: ['openFile', 'multiSelections']
+            }
+          );
+          if (selection && selection.length > 0) {
+            filePathList.push.apply(filePathList, selection);
+            rebuildFileListDisplay();
+          }
+        });
 
         function calculateCommand () {
           let args = [];
@@ -212,8 +258,8 @@
           }
 
           //DEBUG
-          cmd = "-file C:/Users/Jonathan/Desktop/Projects/Node/SWBFUnmungeGUI/mission.lvl";
-          args.push(cmd);
+          //cmd = "-file C:/Users/Jonathan/Desktop/Projects/Node/SWBFUnmungeGUI/mission.lvl";
+          //args.push(cmd);
           //ENDDEBUG
 
           cmd = "-version ";
